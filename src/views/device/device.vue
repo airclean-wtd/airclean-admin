@@ -33,10 +33,10 @@
 
 				<el-col :span="24" align="center">
 					<el-form-item>
-						<el-button type="primary" @click="handleAdd">新增</el-button>
-						<el-button type="primary" v-on:click="getTest">修改</el-button>
-						<el-button type="primary" v-on:click="getTest">删除</el-button>
-						<el-button type="primary" v-on:click="getDevices">查询</el-button>
+						<el-button type="primary" v-on:click="handleAdd">新增</el-button>
+						<el-button type="primary" v-on:click="handleEdit">修改</el-button>
+						<el-button type="primary" v-on:click="handleDel">删除</el-button>
+						<el-button type="primary" v-on:click="getQueryListPage">查询</el-button>
 					</el-form-item>
 				</el-col>
 			</el-form>
@@ -64,9 +64,6 @@
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-<!--
-			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
--->
 			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
 			</el-pagination>
 		</el-col>
@@ -91,8 +88,8 @@
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">确定</el-button>
+				<el-button @click.native="editFormVisible = false">关闭</el-button>
 			</div>
 		</el-dialog>
 
@@ -113,8 +110,8 @@
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">确定</el-button>
+				<el-button @click.native="addFormVisible = false">关闭</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -122,7 +119,7 @@
 
 <script>
 	import util from '../../common/js/util'
-	import { getDeviceListPage, removeDevice, batchRemoveDevice, editDevice, addDevice } from '../../api/device';
+	import { getListPage, dlt, upd, add } from '../../api/device';
 
 	export default {
 		data() {
@@ -136,7 +133,8 @@
 				page: 1,
 				listLoading: false,
 
-				editFormVisible: false,//编辑界面是否显示
+				//编辑界面是否显示
+				editFormVisible: false,
 				editLoading: false,
 				editFormRules: {
 					name: [
@@ -145,26 +143,18 @@
 				},
 				//编辑界面数据
 				editForm: {
-					id: 0,
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
+					no:'',tp:'',mac:'',sid:'',st:''
 				},
 
-				addFormVisible: false,//新增界面是否显示
+				//新增界面是否显示
+				addFormVisible: false,
 				addLoading: false,
 				addFormRules: {
 
 				},
 				//新增界面数据
 				addForm: {
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
+					no:'',tp:'',mac:'',sid:'',st:''
 				}
 
 			}
@@ -173,30 +163,18 @@
 
 			handleCurrentChange(val) {
 				this.page = val;
-				this.getDevices();
+				this.getQueryListPage();
 			},
-			//test
-			getTest() {
-				let para = {
-					page: this.page,
-					name: this.filters.name
-				};
-				getDeviceListPage(para).then(()=>{
-					alert(1);
-				})
-			},
-			//获取设备列表
-			getDevices() {
+			//获取查询列表
+			getQueryListPage() {
 				let para = {
 					name: this.filters.name
 				};
 				//this.listLoading = true;
-				//NProgress.start();
-				getDeviceListPage(para).then((res) => {
+				getListPage(para).then((res) => {
 					this.total = res.data.total;
 					this.devices = res.data.devices;
 					this.listLoading = false;
-					//NProgress.done();
 				});
 			},
 			//删除
@@ -205,16 +183,14 @@
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
-					//NProgress.start();
 					let para = { id: row.id };
-					removeDevice(para).then((res) => {
+					dlt(para).then((res) => {
 						this.listLoading = false;
-						//NProgress.done();
 						this.$message({
 							message: '删除成功',
 							type: 'success'
 						});
-						this.getDevices();
+						this.getQueryListPage();
 					});
 				}).catch(() => {
 
@@ -242,19 +218,16 @@
 					if (valid) {
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.editLoading = true;
-							//NProgress.start();
 							let para = Object.assign({}, this.editForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							editDevice(para).then((res) => {
+							upd(para).then((res) => {
 								this.editLoading = false;
-								//NProgress.done();
 								this.$message({
 									message: '提交成功',
 									type: 'success'
 								});
 								this.$refs['editForm'].resetFields();
 								this.editFormVisible = false;
-								this.getDevices();
+								this.getQueryListPage();
 							});
 						});
 					}
@@ -266,19 +239,16 @@
 					if (valid) {
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.addLoading = true;
-							//NProgress.start();
 							let para = Object.assign({}, this.addForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							addDevice(para).then((res) => {
+							add(para).then((res) => {
 								this.addLoading = false;
-								//NProgress.done();
 								this.$message({
 									message: '提交成功',
 									type: 'success'
 								});
 								this.$refs['addForm'].resetFields();
 								this.addFormVisible = false;
-								this.getDevices();
+								this.getQueryListPage();
 							});
 						});
 					}
@@ -287,31 +257,12 @@
 			selsChange: function (sels) {
 				this.sels = sels;
 			},
-			//批量删除
-			batchRemove: function () {
-				var ids = this.sels.map(item => item.id).toString();
-				this.$confirm('确认删除选中记录吗？', '提示', {
-					type: 'warning'
-				}).then(() => {
-					this.listLoading = true;
-					//NProgress.start();
-					let para = { ids: ids };
-					batchRemoveDevice(para).then((res) => {
-						this.listLoading = false;
-						//NProgress.done();
-						this.$message({
-							message: '删除成功',
-							type: 'success'
-						});
-						this.getDevices();
-					});
-				}).catch(() => {
-
-				});
-			}
 		},
 		mounted() {
-			this.getDevices();
+			this.getQueryListPage();
+		},
+		created() {
+			//初始化下拉数据
 		}
 	}
 

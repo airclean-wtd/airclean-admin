@@ -5,8 +5,10 @@ import Home from './views/Home.vue'
 import Main from './views/Main.vue'
 import Form from './views/nav1/Form.vue'
 import user from './views/nav1/user.vue'
-import Room from './views/room/Room.vue'
-import Device from './views/device/Device.vue'
+import Room from './views/room/room.vue'
+import Device from './views/device/device.vue'
+import Config from './views/system/Config.vue'
+
 import Page4 from './views/nav2/Page4.vue'
 import Page5 from './views/nav2/Page5.vue'
 import SysLog from './views/nav3/SysLog.vue'
@@ -58,6 +60,17 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/Room', component: Room, name: '房间管理' },
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '系统设置',
+        iconCls: 'el-icon-menu',//图标样式class
+        //leaf: true,//只有一个节点
+        children: [
+            { path: '/Config', component: Config, name: '常量设置' },
+
         ]
     },
     // {

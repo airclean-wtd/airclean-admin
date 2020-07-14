@@ -2,14 +2,14 @@ import axios from 'axios';
 
 let base = '';
 
-export const getRoomList = params => { return axios.get(`${base}/room/list`, { params: params }); };
+export const getList = params => { return axios.get(`${base}/device/list`, { params: params }); };
 
-export const getRoomListPage = params => { return axios.get(`${base}:8080/room/query`, { params: params }); };
+export const getListPage = params => { return axios.get(`${base}:8080/device/query`, { params: params }); };
 
-export const removeRoom = params => { return axios.get(`${base}/room/remove`, { params: params }); };
+export const dlt = params => { return axios.get(`${base}/device/remove`, { params: params }); };
 
-export const batchRemoveRoom = params => { return axios.get(`${base}/room/batchremove`, { params: params }); };
+export const upd = params => { return axios.get(`${base}/device/edit`, { params: params }); };
 
-export const editRoom = params => { return axios.get(`${base}/room/edit`, { params: params }); };
+export const add = params => { return axios.get(`${base}/device/add`, { params: params }); };
 
-export const addRoom = params => { return axios.get(`${base}/room/add`, { params: params }); };
+export const bind = params => { return axios.get(`${base}/device/bind`, { params: params }); };
