@@ -211,11 +211,11 @@
 					pageIndex:this.page,
 					no:this.filters.no,
 					name:this.filters.name,
-					tp:this.filters.tp,
+					type:this.filters.type,
 					deviceNo:this.filters.deviceNo,
 					deviceMac:this.filters.deviceMac
 				};
-				//this.listLoading = true;
+				// this.listLoading = true;
 				getListPage(para).then((res) => {
 					this.total = res.data.pager.dataCount;
 					this.dataList = res.data.pager.list;
@@ -223,6 +223,7 @@
 				});
 				this.currentSelect = {};
 			},
+			
 			//删除
 			handleDel: function () {
 				if(!this.currentSelect){
