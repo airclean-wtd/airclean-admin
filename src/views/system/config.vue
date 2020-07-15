@@ -28,7 +28,7 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="devices" highlight-current-row v-loading="listLoading"  style="width: 100%;">
+		<el-table :data="dataList" highlight-current-row v-loading="listLoading"  style="width: 100%;">
 
 			<el-table-column prop="index" label="序号" sortable>
 			</el-table-column>
@@ -105,7 +105,7 @@
 				filters: {
 					key:'',name:'',value:''
 				},
-				devices: [],
+				datalist: [],
 				tpList: [{id:'类型1'},{id:'类型2'}],
 				total: 0,
 				page: 1,
@@ -148,8 +148,8 @@
 				};
 				//this.listLoading = true;
 				getListPage(para).then((res) => {
-					this.total = res.data.total;
-					this.devices = res.data.devices;
+					this.total = res.data.pager.dataCount;
+					this.dataList = res.data.pager.list;
 					this.listLoading = false;
 				});
 			},
@@ -182,11 +182,7 @@
 			handleAdd: function () {
 				this.addFormVisible = true;
 				this.addForm = {
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
+					key:'',name:'',value:'',odr:''
 				};
 			},
 			//编辑

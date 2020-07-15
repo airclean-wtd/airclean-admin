@@ -29,6 +29,9 @@
 							<el-option label="区域二" value="beijing"></el-option>
 						</el-select>
 					</el-form-item>
+					<el-form-item label="设备IP">
+						<el-input v-model="filters.ip" placeholder="设备地址"></el-input>
+					</el-form-item>
 				</el-col>
 
 				<el-col :span="24" align="center">
@@ -43,7 +46,7 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="devices" highlight-current-row v-loading="listLoading"  style="width: 100%;">
+		<el-table :data="dataList" highlight-current-row v-loading="listLoading"  style="width: 100%;">
 
 			<el-table-column prop="index" label="序号" sortable>
 			</el-table-column>
@@ -79,6 +82,9 @@
 				</el-form-item>
 				<el-form-item label="设备MAC">
 					<el-input v-model="editForm.mac" auto-complete="off"></el-input>
+				</el-form-item>
+				<el-form-item label="设备IP">
+					<el-input v-model="editForm.ip" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="设备地址">
 					<el-input v-model="editForm.sid" auto-complete="off"></el-input>
@@ -125,9 +131,9 @@
 		data() {
 			return {
 				filters: {
-					name: '',no:'',tp:'',sid:'',mac:'',st:'',index:''
+					name: '',no:'',tp:'',sid:'',mac:'',st:'',index:'',ip:''
 				},
-				devices: [],
+				dataList: [],
 				tpList: [{id:'类型1'},{id:'类型2'}],
 				total: 0,
 				page: 1,
@@ -172,8 +178,8 @@
 				};
 				//this.listLoading = true;
 				getListPage(para).then((res) => {
-					this.total = res.data.total;
-					this.devices = res.data.devices;
+					this.total = res.data.pager.dataCount;
+					this.dataList = res.data.pager.list;
 					this.listLoading = false;
 				});
 			},

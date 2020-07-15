@@ -14,7 +14,7 @@
 					</el-form-item>
 
 					<el-form-item label="楼层">
-						<el-select v-model="filters.tp"  placeholder="楼层">
+						<el-select v-model="filters.type"  placeholder="楼层">
 							<el-option :value="tp.id" :label="tp.id"  v-for="tp in tpList" ></el-option>
 						</el-select>
 					</el-form-item>
@@ -23,10 +23,10 @@
 				<el-col :span="24">
 
 					<el-form-item label="设备编号">
-						<el-input v-model="filters.sid" placeholder="设备地址"></el-input>
+						<el-input v-model="filters.deviceNo" placeholder="设备地址"></el-input>
 					</el-form-item>
 					<el-form-item label="设备MAC">
-						<el-input v-model="filters.mac" placeholder="设备MAC"></el-input>
+						<el-input v-model="filters.deviceMac" placeholder="设备MAC"></el-input>
 					</el-form-item>
 				</el-col>
 
@@ -44,28 +44,28 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="rooms" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
+		<el-table :data="dataList" highlight-current-row v-loading="listLoading" @row-click="handleSelect" style="width: 100%;">
 
-			<el-table-column prop="name" label="房间编号"  sortable>
+			<el-table-column prop="no" label="房间编号"  sortable>
 			</el-table-column>
-			<el-table-column prop="sex" label="房间名称"  sortable>
+			<el-table-column prop="name" label="房间名称"  sortable>
 			</el-table-column>
-			<el-table-column prop="age" label="楼层"  sortable>
+			<el-table-column prop="type" label="楼层"  sortable>
 			</el-table-column>
-			<el-table-column prop="birth" label="设备编号"  sortable>
+			<el-table-column prop="deviceNo" label="设备编号"  sortable>
 			</el-table-column>
-			<el-table-column prop="birth" label="设备类型"  sortable>
+			<el-table-column prop="deviceTp" label="设备类型"  sortable>
 			</el-table-column>
-			<el-table-column prop="birth" label="设备MAC"  sortable>
+			<el-table-column prop="deviceMac" label="设备MAC"  sortable>
 			</el-table-column>
-			<el-table-column prop="birth" label="设备状态"  sortable>
+			<el-table-column prop="deviceSt" label="设备状态"  sortable>
 			</el-table-column>
 
 		</el-table>
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
+			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="10" :total="total" style="float:right;">
 			</el-pagination>
 		</el-col>
 
@@ -79,10 +79,11 @@
 					<el-input v-model="editForm.name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="楼层">
-					<el-select v-model="editForm.tp" placeholder="设备状态">
-						<el-option label="区域一" value="shanghai"></el-option>
-						<el-option label="区域二" value="beijing"></el-option>
-					</el-select>
+					<el-input v-model="editForm.type" auto-complete="off"></el-input>
+<!--					<el-select v-model="editForm.type" placeholder="设备状态">-->
+<!--						<el-option label="区域一" value="shanghai"></el-option>-->
+<!--						<el-option label="区域二" value="beijing"></el-option>-->
+<!--					</el-select>-->
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -95,13 +96,13 @@
 		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
 				<el-form-item label="房间编号" prop="name">
-					<el-input v-model="editForm.no" auto-complete="off"></el-input>
+					<el-input v-model="addForm.no" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="房间名称">
-					<el-input v-model="editForm.name" auto-complete="off"></el-input>
+					<el-input v-model="addForm.name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="楼层">
-					<el-input v-model="editForm.tp" auto-complete="off"></el-input>
+					<el-input v-model="addForm.type" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -117,19 +118,19 @@
 					<el-input v-model="bindForm.no" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="楼层">
-					<el-input v-model="bindForm.tp" auto-complete="off"></el-input>
+					<el-input v-model="bindForm.type" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="房间名称">
 					<el-input v-model="bindForm.name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="设备类型">
-					<el-input v-model="bindForm.devicetp" auto-complete="off"></el-input>
+					<el-input v-model="bindForm.deviceTp" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="设备编号">
-					<el-input v-model="bindForm.deviceno" auto-complete="off"></el-input>
+					<el-input v-model="bindForm.deviceNo" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="设备MAC">
-					<el-input v-model="bindForm.mac" auto-complete="off"></el-input>
+					<el-input v-model="bindForm.deviceMac" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -148,13 +149,14 @@
 		data() {
 			return {
 				filters: {
-					name: ''
+					no:'',type:'',name:'',deviceNo:'',deviceMac:''
 				},
-				rooms: [],
+				dataList: [],
+				tpList: [],
 				total: 0,
 				page: 1,
 				listLoading: false,
-				sels: [],//列表选中列
+				currentSelect: {},//列表选中列
 
 				//绑定界面
 				bindFormVisible: false,
@@ -166,7 +168,7 @@
 				},
 				//编辑界面数据
 				bindForm: {
-					no:'',tp:'',name:'',devicetp:'',deviceno:'',mac:''
+					no:'',type:'',name:'',deviceNo:'',deviceMac:'',deviceTp:''
 				},
 
 				//编辑界面是否显示
@@ -179,7 +181,7 @@
 				},
 				//编辑界面数据
 				editForm: {
-					no:'',name:'',tp:''
+					no:'',name:'',type:''
 				},
 
 				//新增界面是否显示
@@ -192,7 +194,7 @@
 				},
 				//新增界面数据
 				addForm: {
-					no:'',name:'',tp:''
+					no:'',name:'',type:''
 				}
 
 			}
@@ -206,22 +208,31 @@
 			//获取查询列表
 			getQueryListPage() {
 				let para = {
-					name: this.filters.name
+					pageIndex:this.page,
+					no:this.filters.no,
+					name:this.filters.name,
+					tp:this.filters.tp,
+					deviceNo:this.filters.deviceNo,
+					deviceMac:this.filters.deviceMac
 				};
 				//this.listLoading = true;
 				getListPage(para).then((res) => {
-					this.total = res.data.total;
-					this.rooms = res.data.rooms;
+					this.total = res.data.pager.dataCount;
+					this.dataList = res.data.pager.list;
 					this.listLoading = false;
 				});
+				this.currentSelect = {};
 			},
 			//删除
-			handleDel: function (index, row) {
+			handleDel: function () {
+				if(!this.currentSelect){
+					return;
+				}
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
-					let para = { id: row.id };
+					let para = {no:this.currentSelect.no};
 					dlt(para).then((res) => {
 						this.listLoading = false;
 						this.$message({
@@ -235,9 +246,12 @@
 				});
 			},
 			//显示编辑界面
-			handleEdit: function (index, row) {
+			handleEdit: function () {
+				if(!this.currentSelect){
+					return;
+				}
 				this.editFormVisible = true;
-				this.editForm = Object.assign({}, row);
+				this.editForm = Object.assign({}, this.currentSelect);
 			},
 			//显示绑定界面
 			handleBind: function (index, row) {
@@ -248,11 +262,7 @@
 			handleAdd: function () {
 				this.addFormVisible = true;
 				this.addForm = {
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
+					no:'',name:'',type:''
 				};
 			},
 			//编辑
@@ -307,6 +317,7 @@
 							this.addLoading = true;
 							let para = Object.assign({}, this.addForm);
 
+							//let para = JSON.stringify(this.addForm);
 							add(para).then((res) => {
 								this.addLoading = false;
 								this.$message({
@@ -321,8 +332,9 @@
 					}
 				});
 			},
-			selsChange: function (sels) {
-				this.sels = sels;
+			handleSelect: function (selected) {
+
+				this.currentSelect = selected;
 			},
 		},
 		mounted() {
