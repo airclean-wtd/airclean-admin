@@ -46,7 +46,7 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="dataList" highlight-current-row v-loading="listLoading"  style="width: 100%;">
+		<el-table :data="dataList" highlight-current-row v-loading="listLoading" @row-click="handleSelect" style="width: 100%;">
 
 			<el-table-column prop="index" label="序号" sortable>
 			</el-table-column>
@@ -56,11 +56,15 @@
 			</el-table-column>
 			<el-table-column prop="mac" label="设备MAC"  sortable>
 			</el-table-column>
+			<el-table-column prop="ip" label="设备IP"  sortable>
+			</el-table-column>
+			<el-table-column prop="port" label="设备端口"  sortable>
+			</el-table-column>
 			<el-table-column prop="sid" label="设备地址"  sortable>
 			</el-table-column>
 			<el-table-column prop="st" label="设备状态"  sortable>
 			</el-table-column>
-			<el-table-column prop="room" label="关联房间"  sortable>
+			<el-table-column prop="roomName" label="关联房间"  sortable>
 			</el-table-column>
 
 		</el-table>
@@ -86,6 +90,9 @@
 				<el-form-item label="设备IP">
 					<el-input v-model="editForm.ip" auto-complete="off"></el-input>
 				</el-form-item>
+				<el-form-item label="设备端口">
+					<el-input v-model="editForm.port" auto-complete="off"></el-input>
+				</el-form-item>
 				<el-form-item label="设备地址">
 					<el-input v-model="editForm.sid" auto-complete="off"></el-input>
 				</el-form-item>
@@ -107,6 +114,12 @@
 				</el-form-item>
 				<el-form-item label="设备MAC">
 					<el-input v-model="addForm.mac" auto-complete="off"></el-input>
+				</el-form-item>
+				<el-form-item label="设备IP">
+					<el-input v-model="addForm.ip" auto-complete="off"></el-input>
+				</el-form-item>
+				<el-form-item label="设备端口">
+					<el-input v-model="addForm.port" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="设备地址">
 					<el-input v-model="addForm.sid" auto-complete="off"></el-input>
@@ -138,6 +151,7 @@
 				total: 0,
 				page: 1,
 				listLoading: false,
+				currentSelect: {},//列表选中列
 
 				//编辑界面是否显示
 				editFormVisible: false,
@@ -174,9 +188,15 @@
 			//获取查询列表
 			getQueryListPage() {
 				let para = {
-					name: this.filters.name
+					pageIndex:this.page,
+					no: this.filters.no,
+					tp: this.filters.tp,
+					mac: this.filters.mac,
+					ip: this.filters.ip,
+					st: this.filters.st,
+					sid: this.filters.sid
 				};
-				//this.listLoading = true;
+				this.listLoading = true;
 				getListPage(para).then((res) => {
 					this.total = res.data.pager.dataCount;
 					this.dataList = res.data.pager.list;
@@ -184,12 +204,12 @@
 				});
 			},
 			//删除
-			handleDel: function (index, row) {
+			handleDel: function () {
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
-					let para = { id: row.id };
+					let para = { no: this.filters.no };
 					dlt(para).then((res) => {
 						this.listLoading = false;
 						this.$message({
@@ -203,9 +223,12 @@
 				});
 			},
 			//显示编辑界面
-			handleEdit: function (index, row) {
+			handleEdit: function () {
+				if(!this.currentSelect){
+					return;
+				}
 				this.editFormVisible = true;
-				this.editForm = Object.assign({}, row);
+				this.editForm = Object.assign({}, this.currentSelect);
 			},
 			//显示新增界面
 			handleAdd: function () {
