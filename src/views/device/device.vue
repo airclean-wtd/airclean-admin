@@ -166,7 +166,7 @@
 			}
 		},
 		methods: {
-
+			//翻页
 			handleCurrentChange(val) {
 				this.page = val;
 				this.getQueryListPage();
@@ -211,11 +211,7 @@
 			handleAdd: function () {
 				this.addFormVisible = true;
 				this.addForm = {
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
+					name: '',no:'',tp:'',sid:'',mac:'',st:'',index:'',ip:''
 				};
 			},
 			//编辑
@@ -260,8 +256,10 @@
 					}
 				});
 			},
-			selsChange: function (sels) {
-				this.sels = sels;
+			//选中处理
+			handleSelect: function (selected) {
+
+				this.currentSelect = selected;
 			},
 		},
 		mounted() {

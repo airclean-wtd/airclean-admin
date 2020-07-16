@@ -2,12 +2,10 @@ import axios from 'axios';
 
 let base = '';
 
-export const getList = params => { return axios.get(`${base}/device/list`, { params: params }); };
+export const getListPage = params => { return axios.get(`http://localhost:8080/dataConfig/queryPage`, { params: params });};
 
-export const getListPage = params => { return axios.get(`${base}:8080/device/query`, { params: params }); };
+export const dlt = params => { return axios.get(`http://localhost:8080/dataConfig/delete`, { params: params }); };
 
-export const dlt = params => { return axios.get(`${base}/device/remove`, { params: params }); };
+export const upd = params => { return axios.post(`http://localhost:8080/dataConfig/save`, params,{headers: {"Content-Type": "application/json;charset=utf-8"}});};
 
-export const upd = params => { return axios.get(`${base}/device/edit`, { params: params }); };
-
-export const add = params => { return axios.get(`${base}/device/add`, { params: params }); };
+export const add = params => { return axios.post(`http://localhost:8080/dataConfig/save`, params,{headers: {"Content-Type": "application/json;charset=utf-8"}});};

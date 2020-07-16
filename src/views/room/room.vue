@@ -71,7 +71,7 @@
 
 		<!--编辑界面-->
 		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+			<el-form :model="editForm" label-width="80px" ref="editForm">
 				<el-form-item label="房间编号" prop="name">
 					<el-input v-model="editForm.no" auto-complete="off"></el-input>
 				</el-form-item>
@@ -94,7 +94,7 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
+			<el-form :model="addForm" label-width="80px" ref="addForm">
 				<el-form-item label="房间编号" prop="name">
 					<el-input v-model="addForm.no" auto-complete="off"></el-input>
 				</el-form-item>
@@ -333,6 +333,7 @@
 					}
 				});
 			},
+			//选中处理
 			handleSelect: function (selected) {
 
 				this.currentSelect = selected;

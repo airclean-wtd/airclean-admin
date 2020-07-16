@@ -28,7 +28,7 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="dataList" highlight-current-row v-loading="listLoading"  style="width: 100%;">
+		<el-table :data="dataList" highlight-current-row v-loading="listLoading"  @row-click="handleSelect" style="width: 100%;">
 
 			<el-table-column prop="index" label="序号" sortable>
 			</el-table-column>
@@ -38,14 +38,14 @@
 			</el-table-column>
 			<el-table-column prop="value" label="配置值"  sortable>
 			</el-table-column>
-			<el-table-column prop="odr" label="顺序"  sortable>
+			<el-table-column prop="order" label="顺序"  sortable>
 			</el-table-column>
 
 		</el-table>
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
+			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="10" :total="total" style="float:right;">
 			</el-pagination>
 		</el-col>
 
@@ -62,7 +62,7 @@
 					<el-input v-model="editForm.value" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="顺序">
-					<el-input v-model="editForm.odr" auto-complete="off"></el-input>
+					<el-input v-model="editForm.order" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -73,7 +73,7 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
+			<el-form :model="addForm" label-width="80px" ref="addForm">
 				<el-form-item label="常量键" prop="key">
 					<el-input v-model="addForm.key" auto-complete="off"></el-input>
 				</el-form-item>
@@ -84,7 +84,7 @@
 					<el-input v-model="addForm.value" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="顺序">
-					<el-input v-model="addForm.odr" auto-complete="off"></el-input>
+					<el-input v-model="addForm.order" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -105,11 +105,12 @@
 				filters: {
 					key:'',name:'',value:''
 				},
-				datalist: [],
+				dataList: [],
 				tpList: [{id:'类型1'},{id:'类型2'}],
 				total: 0,
 				page: 1,
 				listLoading: false,
+				currentSelect: {},//列表选中列
 
 				//编辑界面是否显示
 				editFormVisible: false,
@@ -144,9 +145,12 @@
 			//获取查询列表
 			getQueryListPage() {
 				let para = {
-					name: this.filters.name
+					pageIndex:this.page,
+					key: this.filters.key,
+					name: this.filters.name,
+					value: this.filters.value
 				};
-				//this.listLoading = true;
+				this.listLoading = true;
 				getListPage(para).then((res) => {
 					this.total = res.data.pager.dataCount;
 					this.dataList = res.data.pager.list;
@@ -159,10 +163,9 @@
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
-					let para = { id: row.id };
+					let para = { key: this.currentSelect.key };
 					dlt(para).then((res) => {
 						this.listLoading = false;
-						//NProgress.done();
 						this.$message({
 							message: '删除成功',
 							type: 'success'
@@ -174,9 +177,12 @@
 				});
 			},
 			//显示编辑界面
-			handleEdit: function (index, row) {
+			handleEdit: function () {
+				if(!this.currentSelect){
+					return;
+				}
 				this.editFormVisible = true;
-				this.editForm = Object.assign({}, row);
+				this.editForm = Object.assign({}, this.currentSelect);
 			},
 			//显示新增界面
 			handleAdd: function () {
@@ -191,11 +197,9 @@
 					if (valid) {
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.editLoading = true;
-							//NProgress.start();
 							let para = Object.assign({}, this.editForm);
 							upd(para).then((res) => {
 								this.editLoading = false;
-								//NProgress.done();
 								this.$message({
 									message: '提交成功',
 									type: 'success'
@@ -217,7 +221,6 @@
 							let para = Object.assign({}, this.addForm);
 							add(para).then((res) => {
 								this.addLoading = false;
-								//NProgress.done();
 								this.$message({
 									message: '提交成功',
 									type: 'success'
@@ -230,8 +233,9 @@
 					}
 				});
 			},
-			selsChange: function (sels) {
-				this.sels = sels;
+			handleSelect: function (selected) {
+
+				this.currentSelect = selected;
 			},
 		},
 		mounted() {
