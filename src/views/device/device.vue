@@ -80,10 +80,10 @@
 		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="设备编号" prop="no">
-					<el-input v-model="editForm.no" readonly="true"></el-input>
+					<el-input v-model="editForm.no" readonly=true></el-input>
 				</el-form-item>
 				<el-form-item label="设备类型">
-					<el-input v-model="editForm.tp" readonly="true"></el-input>
+					<el-input v-model="editForm.tp" readonly=true></el-input>
 				</el-form-item>
 				<el-form-item label="设备MAC">
 					<el-input v-model="editForm.mac" ></el-input>

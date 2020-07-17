@@ -15,7 +15,7 @@
 
 					<el-form-item label="楼层">
 						<el-select v-model="filters.type"  placeholder="楼层">
-							<el-option :value="tp.id" :label="tp.id"  v-for="tp in tpList" ></el-option>
+							<el-option :value="type.value" :label="type.label"  v-for="type in tpList" ></el-option>
 						</el-select>
 					</el-form-item>
 				</el-col>
@@ -23,7 +23,7 @@
 				<el-col :span="24">
 
 					<el-form-item label="设备编号">
-						<el-input v-model="filters.deviceNo" placeholder="设备地址"></el-input>
+						<el-input v-model="filters.deviceNo" placeholder="设备编号"></el-input>
 					</el-form-item>
 					<el-form-item label="设备MAC">
 						<el-input v-model="filters.deviceMac" placeholder="设备MAC"></el-input>
@@ -79,11 +79,9 @@
 					<el-input v-model="editForm.name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="楼层">
-					<el-input v-model="editForm.type" auto-complete="off"></el-input>
-<!--					<el-select v-model="editForm.type" placeholder="设备状态">-->
-<!--						<el-option label="区域一" value="shanghai"></el-option>-->
-<!--						<el-option label="区域二" value="beijing"></el-option>-->
-<!--					</el-select>-->
+					<el-select v-model="editForm.type"  placeholder="请选择" width="320px;">
+						<el-option :value="type.value" :label="type.label"  v-for="type in tpListForAdd" ></el-option>
+					</el-select>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -102,7 +100,9 @@
 					<el-input v-model="addForm.name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="楼层">
-					<el-input v-model="addForm.type" auto-complete="off"></el-input>
+					<el-select v-model="addForm.type"  placeholder="请选择" width="320px;">
+						<el-option :value="type.value" :label="type.label"  v-for="type in tpListForAdd" ></el-option>
+					</el-select>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -115,27 +115,31 @@
 		<el-dialog title="设备绑定" :visible.sync="bindFormVisible" :close-on-click-modal="false">
 			<el-form :model="bindForm" label-width="80px"  ref="bindForm">
 				<el-form-item label="房间编号" prop="no">
-					<el-input v-model="bindForm.no" auto-complete="off"></el-input>
+					<el-input v-model="bindForm.no"  readonly=true></el-input>
 				</el-form-item>
 				<el-form-item label="楼层">
-					<el-input v-model="bindForm.type" auto-complete="off"></el-input>
+					<el-input v-model="bindForm.type" readonly=true></el-input>
 				</el-form-item>
 				<el-form-item label="房间名称">
-					<el-input v-model="bindForm.name" auto-complete="off"></el-input>
+					<el-input v-model="bindForm.name"  readonly=true></el-input>
 				</el-form-item>
 				<el-form-item label="设备类型">
-					<el-input v-model="bindForm.deviceTp" auto-complete="off"></el-input>
+					<el-select v-model="bindForm.deviceTp"  @change="deviceTpChange" placeholder="设备类型">
+						<el-option :value="type.value" :label="type.label"  v-for="type in deviceTpList" ></el-option>
+					</el-select>
 				</el-form-item>
 				<el-form-item label="设备编号">
-					<el-input v-model="bindForm.deviceNo" auto-complete="off"></el-input>
+					<el-select v-model="bindForm.deviceNo" @change="deviceNoChange" placeholder="设备编号">
+						<el-option :value="type.no" :label="type.label"  v-for="type in deviceList" ></el-option>
+					</el-select>
 				</el-form-item>
 				<el-form-item label="设备MAC">
-					<el-input v-model="bindForm.deviceMac" auto-complete="off"></el-input>
+					<el-input v-model="bindForm.deviceMac" auto-complete="off" readonly=true></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-				<el-button type="primary" @click.native="bindSubmit" :loading="editLoading">确定</el-button>
-				<el-button @click.native="editFormVisible = false">关闭</el-button>
+				<el-button type="primary" @click.native="bindSubmit" :loading="bindLoading">确定</el-button>
+				<el-button @click.native="bindFormVisible = false">关闭</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -144,6 +148,9 @@
 <script>
 	import util from '../../common/js/util'
 	import { getListPage, dlt, upd, add } from '../../api/room';
+	import { getDeviceTpList} from "../../api/config";
+	import { getDeviceList } from '../../api/device';
+
 
 	export default {
 		data() {
@@ -152,7 +159,10 @@
 					no:'',type:'',name:'',deviceNo:'',deviceMac:''
 				},
 				dataList: [],
-				tpList: [],
+				tpListForAdd:[],
+				tpList: [{value:"",label:"全部"}],
+				deviceTpList: [{value:"",label:"不绑定"}],
+				deviceList: [{no:"",label:"不绑定"}],
 				total: 0,
 				page: 1,
 				listLoading: false,
@@ -260,9 +270,14 @@
 				this.editForm = Object.assign({}, this.currentSelect);
 			},
 			//显示绑定界面
-			handleBind: function (index, row) {
+			handleBind: function () {
+				if(!this.currentSelect){
+					return;
+				}
 				this.bindFormVisible = true;
-				this.bindForm = Object.assign({}, row);
+				this.bindForm = Object.assign({}, this.currentSelect);
+				this.bindForm.deviceTp="";
+				this.bindForm.deviceNo="";
 			},
 			//显示新增界面
 			handleAdd: function () {
@@ -323,7 +338,6 @@
 							this.addLoading = true;
 							let para = Object.assign({}, this.addForm);
 
-							//let para = JSON.stringify(this.addForm);
 							add(para).then((res) => {
 								this.addLoading = false;
 								this.$message({
@@ -343,17 +357,78 @@
 
 				this.currentSelect = selected;
 			},
+			//设备编号变化
+			deviceNoChange: function (selected) {
+
+				for (let device of this.deviceList) {
+					if(device.no===selected){
+						this.bindForm.deviceMac =device.mac;
+					}
+				}
+			},
+			//楼层下拉初始化
+			initRoomTpList: function () {
+
+				let para = {key:"FLOOR"};
+				//查询常量
+				getDeviceTpList(para).then((res)=>{
+					//条件查询下拉
+					for (let resKey of res.data.dataList) {
+						this.tpList.push(resKey);
+					}
+					//新增下拉
+					this.tpListForAdd = res.data.dataList;
+				})
+			},
+			//设备类型变换
+			deviceTpChange: function(){
+
+				this.deviceList = [{no:"",label:"不绑定"}];
+				//设备下拉
+				this.initDeviceList();
+			},
+			//设备类型下拉初始化
+			initDeviceTpList: function () {
+
+				let para = {key:"DEVICE_TP"};
+				//查询常量
+				getDeviceTpList(para).then((res)=>{
+					//条件查询下拉
+					for (let resKey of res.data.dataList) {
+						this.deviceTpList.push(resKey);
+					}
+				})
+			},
+			//设备下拉初始化
+			initDeviceList: function () {
+
+				let para={tp:this.bindForm.deviceTp};
+
+				//查询设备列表
+				getDeviceList(para).then((res)=>{
+					//条件查询下拉
+					for (let resKey of res.data.dataList) {
+						this.deviceList.push(resKey);
+					}
+				})
+			},
 		},
 		mounted() {
 			this.getQueryListPage();
 		},
 		created() {
 			//初始化下拉数据
+			this.initRoomTpList();
+			//deviceList下拉
+			this.initDeviceTpList();
+
 		}
 	}
 
 </script>
 
 <style scoped>
-
+	.el-form-item .el-select {
+		width: 100%;
+	}
 </style>

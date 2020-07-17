@@ -2,6 +2,8 @@ import axios from 'axios';
 
 let base = '';
 
+export const getDeviceList = params => { return axios.get(`http://localhost:8080/device/queryList`, { params: params });};
+
 export const getListPage = params => { return axios.get(`http://localhost:8080/device/queryPage`, { params: params });};
 
 export const dlt = params => { return axios.get(`http://localhost:8080/device/delete`, { params: params }); };
