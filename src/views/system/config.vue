@@ -30,6 +30,8 @@
 		<!--列表-->
 		<el-table :data="dataList" highlight-current-row v-loading="listLoading"  @row-click="handleSelect" style="width: 100%;">
 
+			<el-table-column prop="cfgNo" label="主键" v-if="false" sortable>
+			</el-table-column>
 			<el-table-column prop="index" label="序号" sortable>
 			</el-table-column>
 			<el-table-column prop="key" label="配置键"  sortable>
@@ -53,6 +55,7 @@
 		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="常量键" prop="key">
+					<el-input v-model="editForm.cfgNo" v-if="false" ></el-input>
 					<el-input v-model="editForm.key" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="常量名称">
@@ -106,7 +109,6 @@
 					key:'',name:'',value:''
 				},
 				dataList: [],
-				tpList: [{id:'类型1'},{id:'类型2'}],
 				total: 0,
 				page: 1,
 				listLoading: false,
@@ -163,7 +165,7 @@
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
-					let para = { key: this.currentSelect.key };
+					let para = { cfgNo: this.currentSelect.cfgNo };
 					dlt(para).then((res) => {
 						this.listLoading = false;
 						this.$message({

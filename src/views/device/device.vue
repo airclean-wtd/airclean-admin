@@ -2,7 +2,7 @@
 	<section>
 		<!--工具条-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-			<el-form :inline="true" :model="filters">
+			<el-form :inline="true" :model="filters" label-width="80px">
 
 				<el-col :span="24">
 					<el-form-item label="设备编号">
@@ -10,7 +10,7 @@
 					</el-form-item>
 					<el-form-item label="设备类型">
 						<el-select v-model="filters.tp"  placeholder="设备类型">
-							<el-option :value="tp.id" :label="tp.id"  v-for="tp in tpList" ></el-option>
+							<el-option :value="type.value" :label="type.label"  v-for="type in tpList" ></el-option>
 						</el-select>
 					</el-form-item>
 					<el-form-item label="设备MAC">
@@ -25,12 +25,13 @@
 					</el-form-item>
 					<el-form-item label="设备状态">
 						<el-select v-model="filters.st" placeholder="设备状态">
-							<el-option label="区域一" value="shanghai"></el-option>
-							<el-option label="区域二" value="beijing"></el-option>
+							<el-option label="全部" value=""></el-option>
+							<el-option label="开启" value="1"></el-option>
+							<el-option label="关闭" value="0"></el-option>
 						</el-select>
 					</el-form-item>
 					<el-form-item label="设备IP">
-						<el-input v-model="filters.ip" placeholder="设备地址"></el-input>
+						<el-input v-model="filters.ip" placeholder="设备IP"></el-input>
 					</el-form-item>
 				</el-col>
 
@@ -62,7 +63,7 @@
 			</el-table-column>
 			<el-table-column prop="sid" label="设备地址"  sortable>
 			</el-table-column>
-			<el-table-column prop="st" label="设备状态"  sortable>
+			<el-table-column prop="st" label="设备状态" :formatter="statusFormat" sortable>
 			</el-table-column>
 			<el-table-column prop="roomName" label="关联房间"  sortable>
 			</el-table-column>
@@ -71,7 +72,7 @@
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
+			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="10" :total="total" style="float:right;">
 			</el-pagination>
 		</el-col>
 
@@ -79,25 +80,33 @@
 		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="设备编号" prop="no">
-					<el-input v-model="editForm.no" auto-complete="off"></el-input>
+					<el-input v-model="editForm.no" readonly="true"></el-input>
 				</el-form-item>
 				<el-form-item label="设备类型">
-					<el-input v-model="editForm.tp" auto-complete="off"></el-input>
+					<el-input v-model="editForm.tp" readonly="true"></el-input>
 				</el-form-item>
 				<el-form-item label="设备MAC">
-					<el-input v-model="editForm.mac" auto-complete="off"></el-input>
+					<el-input v-model="editForm.mac" ></el-input>
 				</el-form-item>
 				<el-form-item label="设备IP">
-					<el-input v-model="editForm.ip" auto-complete="off"></el-input>
+					<el-input v-model="editForm.ip" ></el-input>
 				</el-form-item>
 				<el-form-item label="设备端口">
-					<el-input v-model="editForm.port" auto-complete="off"></el-input>
+					<el-input v-model="editForm.port" ></el-input>
 				</el-form-item>
 				<el-form-item label="设备地址">
-					<el-input v-model="editForm.sid" auto-complete="off"></el-input>
+					<el-input v-model="editForm.sid" ></el-input>
 				</el-form-item>
 				<el-form-item label="设备状态">
-					<el-input v-model="editForm.st" auto-complete="off"></el-input>
+					<el-switch
+							v-model="editForm.st"
+							active-text="打开"
+							inactive-text="关闭"
+							active-value="1"
+							inactive-value="0"
+							active-color="#13ce66"
+							inactive-color="#ff4949">
+					</el-switch>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -108,24 +117,35 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="设备类型" prop="tp">
-					<el-input v-model="addForm.tp" auto-complete="off"></el-input>
+
+			<el-form :model="addForm" label-width="80px"  :rules="addFormRules" ref="addForm">
+				<el-form-item label="设备类型" >
+					<el-select v-model="addForm.tp"  placeholder="请选择" width="320px;">
+						<el-option :value="type.value" :label="type.label"  v-for="type in tpListForAdd" ></el-option>
+					</el-select>
 				</el-form-item>
-				<el-form-item label="设备MAC">
-					<el-input v-model="addForm.mac" auto-complete="off"></el-input>
+				<el-form-item label="设备MAC" >
+					<el-input v-model="addForm.mac" ></el-input>
 				</el-form-item>
-				<el-form-item label="设备IP">
-					<el-input v-model="addForm.ip" auto-complete="off"></el-input>
+				<el-form-item label="设备IP" >
+					<el-input v-model="addForm.ip" ></el-input>
 				</el-form-item>
 				<el-form-item label="设备端口">
-					<el-input v-model="addForm.port" auto-complete="off"></el-input>
+					<el-input v-model="addForm.port" ></el-input>
 				</el-form-item>
 				<el-form-item label="设备地址">
-					<el-input v-model="addForm.sid" auto-complete="off"></el-input>
+					<el-input v-model="addForm.sid"></el-input>
 				</el-form-item>
 				<el-form-item label="设备状态">
-					<el-input v-model="addForm.st" auto-complete="off"></el-input>
+					<el-switch
+							v-model="addForm.st"
+							active-text="打开"
+							inactive-text="关闭"
+							active-value="1"
+							inactive-value="0"
+							active-color="#13ce66"
+							inactive-color="#ff4949">
+					</el-switch>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -139,6 +159,7 @@
 <script>
 	import util from '../../common/js/util'
 	import { getListPage, dlt, upd, add } from '../../api/device';
+	import { getDeviceTpList } from '../../api/config';
 
 	export default {
 		data() {
@@ -147,7 +168,8 @@
 					name: '',no:'',tp:'',sid:'',mac:'',st:'',index:'',ip:''
 				},
 				dataList: [],
-				tpList: [{id:'类型1'},{id:'类型2'}],
+				tpListForAdd:[],
+				tpList: [{value:"",label:"全部"}],
 				total: 0,
 				page: 1,
 				listLoading: false,
@@ -174,7 +196,7 @@
 				},
 				//新增界面数据
 				addForm: {
-					no:'',tp:'',mac:'',sid:'',st:''
+					no:'',tp:'',mac:'',sid:'',st:1
 				}
 
 			}
@@ -184,6 +206,11 @@
 			handleCurrentChange(val) {
 				this.page = val;
 				this.getQueryListPage();
+			},
+			//状态枚举格式化
+			statusFormat(row,column){
+				//console.log(row);
+				return row.st==='1'?'开启':'关闭'
 			},
 			//获取查询列表
 			getQueryListPage() {
@@ -209,7 +236,7 @@
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
-					let para = { no: this.filters.no };
+					let para = { no: this.currentSelect.no };
 					dlt(para).then((res) => {
 						this.listLoading = false;
 						this.$message({
@@ -234,7 +261,7 @@
 			handleAdd: function () {
 				this.addFormVisible = true;
 				this.addForm = {
-					name: '',no:'',tp:'',sid:'',mac:'',st:'',index:'',ip:''
+					name: '',no:'',tp:'',sid:'',mac:'',st:'1',index:'',ip:''
 				};
 			},
 			//编辑
@@ -284,17 +311,34 @@
 
 				this.currentSelect = selected;
 			},
+			//设备类型下拉初始化
+			initDeviceTpList: function () {
+
+				let para = {key:"DEVICE_TP"};
+				//查询常量
+				getDeviceTpList(para).then((res)=>{
+					//条件查询下拉
+					for (let resKey of res.data.dataList) {
+						this.tpList.push(resKey);
+					}
+					//新增下拉
+					this.tpListForAdd = res.data.dataList;
+				})
+			}
 		},
 		mounted() {
 			this.getQueryListPage();
 		},
 		created() {
 			//初始化下拉数据
+			this.initDeviceTpList();
 		}
 	}
 
 </script>
 
 <style scoped>
-
+	.el-form-item .el-select {
+		width: 100%;
+	}
 </style>

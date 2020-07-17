@@ -58,7 +58,7 @@
 			</el-table-column>
 			<el-table-column prop="deviceMac" label="设备MAC"  sortable>
 			</el-table-column>
-			<el-table-column prop="deviceSt" label="设备状态"  sortable>
+			<el-table-column prop="deviceSt" label="设备状态" :formatter="statusFormat" sortable>
 			</el-table-column>
 
 		</el-table>
@@ -200,7 +200,12 @@
 			}
 		},
 		methods: {
-
+			//状态枚举格式化
+			statusFormat(row,column){
+				//console.log(row);
+				return row.deviceSt==='1'?'开启':'关闭'
+			},
+			//翻页
 			handleCurrentChange(val) {
 				this.page = val;
 				this.getQueryListPage();
