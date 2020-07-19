@@ -147,7 +147,7 @@
 
 <script>
 	import util from '../../common/js/util'
-	import { getListPage, dlt, upd, add } from '../../api/room';
+	import { getListPage, dlt, upd, add,bind } from '../../api/room';
 	import { getDeviceTpList} from "../../api/config";
 	import { getDeviceList } from '../../api/device';
 
@@ -213,7 +213,7 @@
 			//状态枚举格式化
 			statusFormat(row,column){
 				//console.log(row);
-				return row.deviceSt==='1'?'开启':'关闭'
+				return row.deviceSt==='1'?'开启':(row.deviceSt==='0'?'关闭':'');
 			},
 			//翻页
 			handleCurrentChange(val) {
