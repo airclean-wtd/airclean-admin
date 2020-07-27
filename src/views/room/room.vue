@@ -232,6 +232,10 @@
 				};
 				// this.listLoading = true;
 				getListPage(para).then((res) => {
+					if(res.data.code!=200){
+						this.listLoading = false;
+						return;
+					}
 					this.total = res.data.pager.dataCount;
 					this.dataList = res.data.pager.list;
 					this.listLoading = false;
