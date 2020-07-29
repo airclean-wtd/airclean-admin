@@ -18,10 +18,10 @@
 
 				<el-col :span="24" align="center">
 					<el-form-item>
+						<el-button type="primary" v-on:click="getQueryListPage">查询</el-button>
 						<el-button type="primary" v-on:click="handleAdd">新增</el-button>
 						<el-button type="primary" v-on:click="handleEdit">修改</el-button>
 						<el-button type="primary" v-on:click="handleDel">删除</el-button>
-						<el-button type="primary" v-on:click="getQueryListPage">查询</el-button>
 					</el-form-item>
 				</el-col>
 			</el-form>
@@ -165,6 +165,15 @@
 			},
 			//删除
 			handleDel: function (index, row) {
+				//未选中提示
+				if(!this.currentSelect.cfgNo){
+					this.$message({
+						message: '请先选中数据！',
+						type: 'warning'
+					});
+					return;
+				}
+
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
@@ -184,7 +193,12 @@
 			},
 			//显示编辑界面
 			handleEdit: function () {
-				if(!this.currentSelect){
+				//未选中提示
+				if(!this.currentSelect.cfgNo){
+					this.$message({
+						message: '请先选中数据！',
+						type: 'warning'
+					});
 					return;
 				}
 				this.editFormVisible = true;

@@ -32,10 +32,10 @@
 
 				<el-col :span="24" align="center">
 					<el-form-item>
+						<el-button type="primary" v-on:click="getQueryListPage">查询</el-button>
 						<el-button type="primary" v-on:click="handleAdd">新增</el-button>
 						<el-button type="primary" v-on:click="handleEdit">修改</el-button>
 						<el-button type="primary" v-on:click="handleDel">删除</el-button>
-						<el-button type="primary" v-on:click="getQueryListPage">查询</el-button>
 						<el-button type="primary" v-on:click="handleBind">设备绑定</el-button>
 					</el-form-item>
 				</el-col>
@@ -115,13 +115,13 @@
 		<el-dialog title="设备绑定" :visible.sync="bindFormVisible" :close-on-click-modal="false">
 			<el-form :model="bindForm" label-width="80px"  ref="bindForm">
 				<el-form-item label="房间编号" prop="no">
-					<el-input v-model="bindForm.no"  readonly=true></el-input>
+					<el-input v-model="bindForm.no"  readonly></el-input>
 				</el-form-item>
 				<el-form-item label="楼层">
-					<el-input v-model="bindForm.type" readonly=true></el-input>
+					<el-input v-model="bindForm.type" readonly></el-input>
 				</el-form-item>
 				<el-form-item label="房间名称">
-					<el-input v-model="bindForm.name"  readonly=true></el-input>
+					<el-input v-model="bindForm.name"  readonly></el-input>
 				</el-form-item>
 				<el-form-item label="设备类型">
 					<el-select v-model="bindForm.deviceTp"  @change="deviceTpChange" placeholder="设备类型">
@@ -134,7 +134,7 @@
 					</el-select>
 				</el-form-item>
 				<el-form-item label="设备MAC">
-					<el-input v-model="bindForm.deviceMac" auto-complete="off" readonly=true></el-input>
+					<el-input v-model="bindForm.deviceMac" auto-complete="off" readonly></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -245,9 +245,15 @@
 			
 			//删除
 			handleDel: function () {
-				if(!this.currentSelect){
+				//未选中提示
+				if(!this.currentSelect.no){
+					this.$message({
+						message: '请先选中数据！',
+						type: 'warning'
+					});
 					return;
 				}
+
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
@@ -267,21 +273,42 @@
 			},
 			//显示编辑界面
 			handleEdit: function () {
-				if(!this.currentSelect){
+				//未选中提示
+				if(!this.currentSelect.no){
+					this.$message({
+						message: '请先选中数据！',
+						type: 'warning'
+					});
 					return;
 				}
+
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, this.currentSelect);
+
 			},
 			//显示绑定界面
 			handleBind: function () {
-				if(!this.currentSelect){
+
+				//未选中提示
+				if(!this.currentSelect.no){
+					this.$message({
+						message: '请先选中数据！',
+						type: 'warning'
+					});
 					return;
 				}
+
 				this.bindFormVisible = true;
 				this.bindForm = Object.assign({}, this.currentSelect);
-				this.bindForm.deviceTp="";
-				this.bindForm.deviceNo="";
+
+				//默认显示不绑定
+				if(!this.bindForm.deviceTp){
+					this.bindForm.deviceTp="";
+				}
+				if(!this.bindForm.deviceNo){
+					this.bindForm.deviceNo="";
+				}
+
 			},
 			//显示新增界面
 			handleAdd: function () {
