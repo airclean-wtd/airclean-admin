@@ -348,7 +348,7 @@
 							let para = Object.assign({}, this.bindForm);
 
 							bind(para).then((res) => {
-								this.editLoading = false;
+								this.bindLoading = false;
 								this.$message({
 									message: '提交成功',
 									type: 'success'
@@ -414,6 +414,9 @@
 			//设备类型变换
 			deviceTpChange: function(){
 
+				//设备清除
+				this.bindForm.deviceNo = "";
+				this.bindForm.deviceMac = "";
 				this.deviceList = [{no:"",label:"不绑定"}];
 				//设备下拉
 				this.initDeviceList();

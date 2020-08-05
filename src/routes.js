@@ -7,6 +7,7 @@ import Form from './views/nav1/Form.vue'
 import user from './views/nav1/user.vue'
 import Room from './views/room/room.vue'
 import Device from './views/device/device.vue'
+import Stat from './views/stat/stat.vue'
 import Config from './views/system/Config.vue'
 
 import Page4 from './views/nav2/Page4.vue'
@@ -60,6 +61,16 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/Room', component: Room, name: '房间管理' },
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'el-icon-menu',//图标样式class
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/Stat', component: Stat, name: '数据统计' },
         ]
     },
     {

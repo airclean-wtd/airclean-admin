@@ -13,10 +13,16 @@ import routes from './routes'
 //import Mock from './mock'
 //Mock.bootstrap();
 import 'font-awesome/css/font-awesome.min.css'
+import Echarts from 'vue-echarts/components/ECharts'
+import echarts from 'echarts/lib/echarts.js'
+import 'echarts/lib/chart/line'
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Vuex)
+//Vue.use(Echarts)
+console.log(echarts)
+Vue.component('v-chart',Echarts)
 
 //NProgress.configure({ showSpinner: false });
 
